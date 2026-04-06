@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drum Kit</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:            #f4f3f0;
+      --surface:       #ffffff;
+      --border:        #43d4fc;
+      --border-active: #0044e3;
+      --text-primary:  #1a1a1a;
+      --text-muted:    #9e9b96;
+      --shadow:        0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(94, 188, 246, 0.05);
+      --shadow-active: 0 0 0 2px #bee8ff, 0 6px 24px rgba(45, 140, 178, 0.12);
+      --radius:        10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ── HEADER ─────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 2.8rem;
+    }
+
+    header h1 {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    header p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      letter-spacing: 0.07em;
+    }
+
+    /* ── GRID ────────────────────────────────────────── */
+    .drum-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+      max-width: 660px;
+    }
+
+    /* ── PAD ─────────────────────────────────────────── */
+    .pad {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem 1rem 1.4rem;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow);
+      transition:all 0.07s;
+    }
+
+    .pad:hover {
+      border-color: #c8c5be;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 28px rgba(0,0,0,0.07);
+      transform: translateY(-1px);
+    }
+
+    /* Add this class via JS on keypress / click */
+    .pad.active {
+      transform: scale(1.1);
+      border-color: var(--border-active);
+      box-shadow: var(--shadow-active);
+      background: #ffffff;
+    }
+
+    /* ── KEY LABEL ───────────────────────────────────── */
+    .pad-key {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    /* ── THIN RULE ───────────────────────────────────── */
+    .pad-divider {
+      width: 22px;
+      height: 1px;
+      background: var(--border);
+      border-radius: 1px;
+    }
+
+    /* ── DRUM NAME ───────────────────────────────────── */
+    .pad-name {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── STATIC WAVEFORM DECORATION ─────────────────── */
+    .pad-wave {
+      display: flex;
+      align-items: center;
+      gap: 2.5px;
+      height: 20px;
+      margin-top: 2px;
+    }
+
+    .pad-wave span {
+      display: block;
+      width: 2.5px;
+      background: #ffe1ac;
+      border-radius: 2px;
+      transition: background 0.08s ease;
+    }
+
+    .pad.active .pad-wave span {
+      background: #888;
+    }
+
+    /* ── FOOTER HINT ─────────────────────────────────── */
+    .hint {
+      margin-top: 2rem;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 480px) {
+      .drum-grid { gap: 0.65rem; }
+      .pad { padding: 1.1rem 0.5rem 1rem; }
+      .pad-key { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>drum kit</h1>
+  <p>press keys A – L &nbsp;·&nbsp; click or tap to play</p>
+</header>
+
+<div class="drum-grid" id="drumGrid">
+
+  <!-- A — Kick -->
+  <div class="pad" id="key-a" data-key="65">
+    <div class="pad-key">A</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Kick</div>
+    <div class="pad-wave">
+      <span style="height:6px"></span>
+      <span style="height:14px"></span>
+      <span style="height:18px"></span>
+      <span style="height:10px"></span>
+      <span style="height:16px"></span>
+      <span style="height:8px"></span>
+      <span style="height:12px"></span>
+    </div>
+  </div>
+
+  <!-- S — Snare -->
+  <div class="pad" id="key-s" data-key="83">
+    <div class="pad-key">S</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Snare</div>
+    <div class="pad-wave">
+      <span style="height:10px"></span>
+      <span style="height:16px"></span>
+      <span style="height:8px"></span>
+      <span style="height:18px"></span>
+      <span style="height:12px"></span>
+      <span style="height:14px"></span>
+      <span style="height:6px"></span>
+    </div>
+  </div>
+
+  <!-- D — Hi-Hat -->
+  <div class="pad" id="key-d" data-key="68">
+    <div class="pad-key">D</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Hi-Hat</div>
+    <div class="pad-wave">
+      <span style="height:14px"></span>
+      <span style="height:6px"></span>
+      <span style="height:18px"></span>
+      <span style="height:8px"></span>
+      <span style="height:16px"></span>
+      <span style="height:10px"></span>
+      <span style="height:14px"></span>
+    </div>
+  </div>
+
+  <!-- F — Clap -->
+  <div class="pad" id="key-f" data-key="70">
+    <div class="pad-key">F</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Clap</div>
+    <div class="pad-wave">
+      <span style="height:8px"></span>
+      <span style="height:18px"></span>
+      <span style="height:10px"></span>
+      <span style="height:14px"></span>
+      <span style="height:6px"></span>
+      <span style="height:16px"></span>
+      <span style="height:12px"></span>
+    </div>
+  </div>
+
+  <!-- G — Tom -->
+  <div class="pad" id="key-g" data-key="71">
+    <div class="pad-key">G</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Tom</div>
+    <div class="pad-wave">
+      <span style="height:16px"></span>
+      <span style="height:10px"></span>
+      <span style="height:6px"></span>
+      <span style="height:18px"></span>
+      <span style="height:8px"></span>
+      <span style="height:14px"></span>
+      <span style="height:10px"></span>
+    </div>
+  </div>
+
+  <!-- H — Ride -->
+  <div class="pad" id="key-h" data-key="72">
+    <div class="pad-key">H</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Ride</div>
+    <div class="pad-wave">
+      <span style="height:12px"></span>
+      <span style="height:18px"></span>
+      <span style="height:14px"></span>
+      <span style="height:6px"></span>
+      <span style="height:16px"></span>
+      <span style="height:10px"></span>
+      <span style="height:8px"></span>
+    </div>
+  </div>
+
+  <!-- J — Cowbell -->
+  <div class="pad" id="key-j" data-key="74">
+    <div class="pad-key">J</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Cowbell</div>
+    <div class="pad-wave">
+      <span style="height:6px"></span>
+      <span style="height:12px"></span>
+      <span style="height:18px"></span>
+      <span style="height:16px"></span>
+      <span style="height:10px"></span>
+      <span style="height:8px"></span>
+      <span style="height:14px"></span>
+    </div>
+  </div>
+
+  <!-- K — Crash -->
+  <div class="pad" id="key-k" data-key="75">
+    <div class="pad-key">K</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Crash</div>
+    <div class="pad-wave">
+      <span style="height:18px"></span>
+      <span style="height:8px"></span>
+      <span style="height:14px"></span>
+      <span style="height:6px"></span>
+      <span style="height:12px"></span>
+      <span style="height:16px"></span>
+      <span style="height:10px"></span>
+    </div>
+  </div>
+
+  <!-- L — Shaker -->
+  <div class="pad" id="key-l" data-key="76">
+    <div class="pad-key">L</div>
+    <div class="pad-divider"></div>
+    <div class="pad-name">Shaker</div>
+    <div class="pad-wave">
+      <span style="height:10px"></span>
+      <span style="height:14px"></span>
+      <span style="height:8px"></span>
+      <span style="height:18px"></span>
+      <span style="height:6px"></span>
+      <span style="height:16px"></span>
+      <span style="height:12px"></span>
+    </div>
+  </div>
+
+</div>
+<audio data-key="65" src="sounds/A_kick.wav"></audio>
+<audio data-key="83" src="sounds/B_snare.wav"></audio>
+<audio data-key="68" src="sounds/C_closed_hihat.wav"></audio>
+<audio data-key="70" src="sounds/D_open_hihat.wav"></audio>
+<audio data-key="71" src="sounds/E_low_tom.wav"></audio>
+<audio data-key="72" src="sounds/F_mid_tom.wav"></audio>
+<audio data-key="74" src="sounds/G_high_tom.wav"></audio>
+<audio data-key="75" src="sounds/H_crash.wav"></audio>
+<audio data-key="76" src="sounds/I_ride.wav"></audio>
+<p class="hint">keyboard &nbsp;·&nbsp; click &nbsp;·&nbsp; tap</p>
+
+<!-- ✏️ Write your JavaScript here -->
+<script>
+  window.addEventListener(`keydown`,function(e){
+    const audio=document.querySelector(`audio[data-key="${e.keyCode}"]`);
+    const key=document.querySelector(`.pad[data-key="${e.keyCode}"]`);
+    if(!audio)
+    {
+      return;
+    }
+    audio.currentTime=0;
+    audio.play();
+    key.classList.add('active');
+  });
+
+  function removeTranstion(e){
+   
+   if(e.propertyName !== 'transform') return;
+     this.classList.remove('active');
+  }
+
+  const keys = document.querySelectorAll('.pad');
+  keys.forEach(key => key.addEventListener("transitionend",removeTranstion));
+</script>
+
+</body>
+</html>
